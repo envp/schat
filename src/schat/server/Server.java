@@ -6,6 +6,11 @@ package schat.server;
  */
 public class Server {
     private int port;
+    
+    /**
+     * Constructor for creating a Server instance
+     * @param port Port at which server listens for incoming connections
+     */
     public Server(int port) {
         this.port = port;
     }
