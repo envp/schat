@@ -15,8 +15,11 @@ public class SChat {
     "java SChat subcommand <options>\n" +
     "\n" +
     "Supported subcommands and their [h]otkeys:\n" +
-    "[s]erver <port>   Starts a new server instance listening to the given port\n" +
-    "                  <port>: The port at which the server should listen for incoming client requests";
+    "[h]elp            Print this usage dialog\n" +
+    "\n" +
+    "[s]erver   <port> Starts a new server instance listening to the given port\n" +
+    "           <port> The port at which the server should listen for incoming client requests\n" +
+    "\n";
 
     /**
      * @param args the command line arguments
@@ -38,6 +41,8 @@ public class SChat {
                 case "client":
                     // Client instantitation
                     break;
+                case "h":
+                case "help":
                 default:
                     System.out.println(USAGE_TIP);
                     break;
