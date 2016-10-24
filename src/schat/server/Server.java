@@ -1,13 +1,16 @@
 package schat.server;
 
 import java.io.IOException;
+import java.io.PrintStream;
 
 import java.util.Set;
 import java.util.HashSet;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+
 import java.net.ServerSocket;
 import java.net.InetAddress;
-
 
 /**
  * Class abstracting the chat server definition. The server handles:
@@ -16,14 +19,16 @@ import java.net.InetAddress;
  * @author Vaibhav Yenamandra (vyenman@ufl.edu)
  */
 public class Server {
-    // Minimum number of users that need to join for rehashing
+    // Minimum number of users that need to join for rehashing the client map
     // This is same as HashSet's initial capacity (per Oracle docs)
     private final int MIN_USERS = 16;
+    private final PrintStream log = System.out;
 
     private ServerSocket sock;
     private int onlineCount = 0;
 
     private Object lock = new Object();
+    private static ExecutorService workers = Executors.newCachedThreadPool();
 
     /**
      * Creates a fresh Server instance
@@ -48,7 +53,7 @@ public class Server {
      * Local address / interface to which the server is listening
      * @return InetAddress object of the local listening interface
      */
-    public InetAddress getLocalAddress() {
+    public InetAddress getInetAddress() {
         return this.sock.getInetAddress();
     }
 
@@ -56,17 +61,21 @@ public class Server {
      * Make the server start listening on the preset port
      */
     public void listen() throws IOException {
-        synchronized(this.lock) {
-            try {
-                new ClientHandler(sock.accept(), onlineCount);
-                onlineCount++;
-            }
-            catch(IOException ioe) {
-                // Log IOException and rethrow
-            }
-            finally {
-                sock.close();
-            }
+        this.log.println("Listening for clients on tcp://" +
+            getInetAddress().getHostAddress() + ":" + getLocalPort());
+        try {
+            workers.execute(
+                new ClientHandler(this.sock.accept(), onlineCount)
+            );
+            onlineCount++;
+        }
+        catch(IOException ioe) {
+            this.log.println("ERROR:" + ioe.getStackTrace());
+            workers.shutdown();
+        }
+        finally {
+            workers.shutdown();
+            this.sock.close();
         }
     }
 }
