@@ -37,18 +37,34 @@ public class ClientInfo {
         this(null, null, -1);
     }
 
+    /**
+     * Accessor method for getting port number
+     * @return port number being used by the client
+     */
     public int getPort() {
         return this.port;
     }
 
+    /**
+     * Accessor
+     * @return InetAddress object representing
+     */
     public InetAddress getAddress() {
         return this.address;
     }
 
+    /**
+     * [getUsername description]
+     * @return [description]
+     */
     public String getUsername() {
         return this.username;
     }
 
+    /**
+     * [isUnset description]
+     * @return [description]
+     */
     public boolean isUnset() {
         return !(port > 0 && address != null && username != null);
     }

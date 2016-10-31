@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 
+import java.util.logging.Logger;
+
 import java.net.ServerSocket;
 import java.net.InetAddress;
 
@@ -40,8 +42,8 @@ public class Server {
     }
 
     /**
-     * The local port to which the current server instance is listening to for
-     * inbound connections
+     * The local port to which the current server instance is listening to
+     *  for inbound connections
      *
      * @return Local system port to which this server instance is bound
      */
@@ -58,23 +60,32 @@ public class Server {
     }
 
     /**
-     * Make the server start listening on the preset port
+     * Make the server start listening on the preset port. Every time a client
+     * connects a new worker thread is created
      */
     public void listen() throws IOException {
         this.log.println("Listening for clients on tcp://" +
-            getInetAddress().getHostAddress() + ":" + getLocalPort());
+            getInetAddress().getHostAddress() + ":" + getLocalPort()
+        );
+
         try {
-            workers.execute(
-                new ClientHandler(this.sock.accept(), onlineCount)
-            );
-            onlineCount++;
+            while(true) {
+                workers.execute(
+                    new ClientHandler(this.sock.accept(), onlineCount)
+                );
+                onlineCount++;
+            }
         }
         catch(IOException ioe) {
-            this.log.println("ERROR:" + ioe.getStackTrace());
+            this.log.println("=== ERROR");
+            ioe.printStackTrace();
             workers.shutdown();
         }
         finally {
-            workers.shutdown();
+            if(!workers.isShutdown()) {
+                this.log.println("Shutting server down");
+                workers.shutdown();
+            }
             this.sock.close();
         }
     }

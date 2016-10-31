@@ -1,7 +1,16 @@
 package schat.server;
 
-import schat.client.ClientInfo;
+import schat.message.*;
+
 import java.net.Socket;
+
+import java.io.PrintStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+import java.io.IOException;
+
+import java.util.logging.Logger;
 
 /**
  *
@@ -10,7 +19,8 @@ import java.net.Socket;
 public class ClientHandler implements Runnable {
     private Socket sock;
     private final int clientId;
-    private ClientInfo info;
+    private ObjectInputStream sockIn;
+    private ObjectOutputStream sockOut;
 
     /**
      * Constructor for creating a new ClientHandler instance
@@ -21,15 +31,26 @@ public class ClientHandler implements Runnable {
     public ClientHandler(Socket cSock, int clientId) {
         this.sock = cSock;
         this.clientId = clientId;
-        this.info = new ClientInfo();
     }
 
-    /**
-     *
-     */
     public void run() {
-        if(this.info.isUnset()) {
-            // Ask client for info
+        try {
+            Message message;
+            this.sockOut = new ObjectOutputStream(this.sock.getOutputStream());
+            this.sockOut.flush();
+            this.sockIn = new ObjectInputStream(this.sock.getInputStream());
+
+            while(true) {
+                    message = (Message) this.sockIn.readObject();
+                    System.out.println(message.getType());
+            }
+        }
+        catch(ClassNotFoundException cnfe) {
+            cnfe.printStackTrace();
+        }
+        catch(IOException ioe) {
+            // handle IOE from object input stream
+            ioe.printStackTrace();
         }
     }
 }
