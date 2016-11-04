@@ -41,8 +41,8 @@ public class ClientHandler implements Runnable {
             this.sockIn = new ObjectInputStream(this.sock.getInputStream());
 
             while(true) {
-                    message = (Message) this.sockIn.readObject();
-                    System.out.println(message.getType());
+                message = (Message) this.sockIn.readObject();
+                System.out.println(message.getType());
             }
         }
         catch(ClassNotFoundException cnfe) {

@@ -1,6 +1,7 @@
 package schat.client;
 
 import schat.message.*;
+import schat.exception.*;
 
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -39,7 +40,7 @@ public class Client implements Runnable {
         this.username = username;
         this.sock = new Socket(serverAddress, port);
         this.stdIn = new BufferedReader(new InputStreamReader(System.in));
-        this.introduction = new Message(MessageType.CLIENT_INTRODUCTION);
+        this.introduction = new Message(MessageType.CLIENT_INTRODUCTION, "", username);
     }
 
     /**
@@ -82,11 +83,27 @@ public class Client implements Runnable {
             sockOut.writeObject(this.introduction);
 
             while(true) {
-                // message = Message.parseMessage(stdIn.readLine());
+                try {
+                    message = Message.parseMessage(stdIn.readLine());
+                    if(message.getBody() != null) {
+                        System.out.println(message);
+                        message.setFrom(this.username);
+                        sockOut.writeObject(message);
+                    }
+
+                    // Print out what we read from the socket
+                    System.out.println(sockIn.readObject());
+                }
+                catch(IllegalMessageException ime) {
+                    System.out.println("[ERROR] " + ime.getMessage());
+                }
             }
         }
         catch(IOException ioe) {
-            ioe.printStackTrace();
+            System.err.println("[ERROR] " + ioe.getMessage());
+        }
+        catch(ClassNotFoundException cnfe) {
+            System.err.println(cnfe.getMessage());
         }
     }
 }

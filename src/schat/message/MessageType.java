@@ -1,5 +1,8 @@
 package schat.message;
 
+/**
+ * @author Vaibhav Yenamandra (vyenman@ufl.edu)
+ */
 public enum MessageType {
     CLIENT_INTRODUCTION,
     CLIENT_QUIT, CLIENT_TIMEOUT,
