@@ -3,13 +3,8 @@ package schat.server;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import java.util.Set;
-import java.util.HashSet;
-
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
-
-import java.util.logging.Logger;
 
 import java.net.ServerSocket;
 import java.net.InetAddress;
@@ -77,8 +72,7 @@ public class Server {
             }
         }
         catch(IOException ioe) {
-            this.log.println("=== ERROR");
-            ioe.printStackTrace();
+            this.log.println("[ERROR] " + ioe.getMessage());
             workers.shutdown();
         }
         finally {

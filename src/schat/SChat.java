@@ -21,7 +21,7 @@ public class SChat {
     "[s]erver   <port> Starts a new server instance listening to the given port\n" +
     "           <port> The port at which the server should listen for incoming client requests\n" +
     "\n" +
-    "[c]lient   <username> <port> Starts a new client instance with the chosen username\n" +
+    "[c]lient   <username> <port> [<ip>] Starts a new client instance with the chosen username\n" +
     "           <username> Username choice of client, subject to change based on server side availability\n" +
     "           <port> Server's listening port to connect to\n" +
     "\n";
@@ -48,9 +48,18 @@ public class SChat {
                     if(args.length < 3) {
                         System.out.println(USAGE_TIP);
                     }
-                    new Thread(
-                        new Client(args[1], Integer.parseInt(args[2]))
-                    ).start();
+                    if(args.length == 3) {
+                        new Thread(
+                            new Client(args[1], Integer.parseInt(args[2]))
+                        ).start();
+                    }
+                    else if(args.length == 4) {
+                        new Thread(
+                            new Client(
+                                args[1], Integer.parseInt(args[2]), args[3]
+                            )
+                        ).start();
+                    }
                     break;
                 case "h":
                 case "help":

@@ -1,19 +1,21 @@
 package schat.client;
 
 import schat.message.*;
-import schat.exception.*;
 
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 
-import java.util.logging.Logger;
 
 /**
  * @author Vaibhav Yenamandra (vyenman@ufl.edu)
@@ -24,8 +26,8 @@ public class Client implements Runnable {
     private BufferedReader stdIn;
     private ObjectInputStream sockIn;
     private ObjectOutputStream sockOut;
-    private final PrintStream log = System.out;
     private Message introduction;
+    private final String DEFAULT_FILE_SAVE_LOCATION = "download";
 
     /**
      * Constructor for a new client instance.
@@ -64,6 +66,86 @@ public class Client implements Runnable {
     }
 
     /**
+     * Helper method for processing inbound text messages
+     * @param msg Message object containing inbound message
+     */
+    private void processInboundTextMessage(Message msg) {
+        if(msg.isPrintable()) {
+            System.out.println(msg);
+        }
+    }
+
+    /**
+     * Helper method for processing inbound file transfers
+     * @param msg Message with file to be read from stream
+     */
+    private void processInboundFileMessage(Message msg, ObjectInputStream in) {
+        long size = msg.getPayloadSize();
+        int length = 0;
+        String fname = msg.getBody();
+        byte[] buffer = new byte[Message.MAX_PAYLOAD_SIZE];
+
+        try {
+            OutputStream outFile = new FileOutputStream(
+                DEFAULT_FILE_SAVE_LOCATION + "/" + this.username + "/" + fname
+            );
+
+            // Process file per established protocol of
+            // Inform -> send
+            while(size > 0 && length != -1) {
+                try {
+                    length = in.read(buffer, 0, length);
+                    outFile.write(buffer);
+                    size -= length;
+                }
+                catch(IOException ioe) {
+                    System.out.println("[ERROR] " + ioe.getMessage());
+                }
+            }
+        }
+        catch(FileNotFoundException fnfe) {
+            System.out.println("[ERROR] Can't find file: " + fnfe.getMessage());
+        }
+    }
+
+    /**
+     * Helper method for processing outbound text messages
+     * @param msg Message object containing outbound message
+     */
+    private void processOutboundTextMessage(Message msg, ObjectOutputStream out) throws IOException {
+        msg.setFrom(this.username);
+        out.writeObject(msg);
+    }
+
+    /**
+     * Helper method for processing outbound file transfers
+     * @param msg Message with path of file to be dumped into network
+     */
+    private void processOutboundFileMessage(Message msg, ObjectOutputStream out) throws IOException {
+        // Try to create a file stream from the supplied object
+        try {
+            InputStream file = new FileInputStream(msg.getBody());
+            OutputStream sockOut = this.sock.getOutputStream();
+
+            byte[] buffer = new byte[Message.MAX_PAYLOAD_SIZE];
+            int length = 0;
+
+            // Tell them the file size to expect
+            File f = new File(msg.getBody());
+            msg.setPayloadSize(f.length());
+            msg.setBody(f.getName());
+            out.writeObject(msg);
+
+            while((length = file.read(buffer)) != -1) {
+                sockOut.write(buffer, 0, length);
+            }
+        }
+        catch(FileNotFoundException fnfe) {
+            System.out.println("[ERROR] Can't find file: " + fnfe.getMessage());
+        }
+    }
+
+    /**
      * There are two actions that happen in the run method.
      *
      * First: The client sends what is called an "introduction" message with
@@ -84,15 +166,29 @@ public class Client implements Runnable {
 
             while(true) {
                 try {
+                    // Read user input from command line
                     message = Message.parseMessage(stdIn.readLine());
-                    if(message.getBody() != null) {
+
+                    // Process if not blank
+                    if(!message.isBlank()) {
                         System.out.println(message);
-                        message.setFrom(this.username);
-                        sockOut.writeObject(message);
+
+                        if(message.isTextMessage()) {
+                            processOutboundTextMessage(message, sockOut);
+                        }
+                        if(message.isFileMessage()) {
+                            processOutboundFileMessage(message, sockOut);
+                        }
                     }
 
-                    // Print out what we read from the socket
-                    System.out.println(sockIn.readObject());
+                    // Read server responses from another socket
+                    message = (Message) sockIn.readObject();
+                    if(message.isTextMessage()) {
+                        processInboundTextMessage(message);
+                    }
+                    if(message.isFileMessage()) {
+                        processInboundFileMessage(message, sockIn);
+                    }
                 }
                 catch(IllegalMessageException ime) {
                     System.out.println("[ERROR] " + ime.getMessage());

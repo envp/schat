@@ -1,4 +1,4 @@
-package schat.exception;
+package schat.message;
 
 import java.io.Serializable;
 

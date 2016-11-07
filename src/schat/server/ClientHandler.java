@@ -3,6 +3,7 @@ package schat.server;
 import schat.message.*;
 
 import java.net.Socket;
+import java.net.SocketException;
 
 import java.io.PrintStream;
 import java.io.ObjectInputStream;
