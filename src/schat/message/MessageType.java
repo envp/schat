@@ -4,6 +4,7 @@ package schat.message;
  * @author Vaibhav Yenamandra (vyenman@ufl.edu)
  */
 public enum MessageType {
+    ACK_INTRO, ACK_QUIT,
     CLIENT_INTRODUCTION,
     CLIENT_QUIT, CLIENT_TIMEOUT,
     CLIENT_TEXT_BROADCAST, CLIENT_TEXT_BLOCKCAST, CLIENT_TEXT_UNICAST,

@@ -1,20 +1,18 @@
 package schat.client;
 
-import schat.message.*;
-
-import java.net.Socket;
-
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import schat.message.*;
 
 
 /**
@@ -144,6 +142,43 @@ public class Client implements Runnable {
             System.out.println("[ERROR] Can't find file: " + fnfe.getMessage());
         }
     }
+    
+    /**
+     * Wraps the username negotiation that initially takes place between the 
+     * client and server.
+     * @param in    ObjectInputStream of the socket being used for the current 
+     *              communication session
+     * @param out   ObjectOutputStream of the socket being used for the current 
+     *              communication session
+     */
+    private void negotiateUsername(ObjectInputStream in, ObjectOutputStream out) 
+            throws IOException, ClassNotFoundException {
+        Message message;
+        String usrn = this.username;
+        // Client introduces itself to the server by telling server
+        // it's choice of username
+        out.writeObject(this.introduction);
+            
+        // Next message by protocol is the server's acknowledgement of
+        // our introduction. 
+        // @TODO    when does this logic of username negotiation break down?
+        //          This is central as it also affects the server's user lookup 
+        //          functionality
+        message = (Message) in.readObject();
+        
+        while(message.getType() == MessageType.ACK_INTRO) {
+            if(message.getBody().equals("OK")) {
+                break;
+            }
+            
+            System.out.print("Chosen username (" + this.username + 
+                    ") is unavailable. " + "Please choose another one: ");
+            usrn = this.stdIn.readLine();
+            this.introduction.setFrom(usrn);
+            out.writeObject(this.introduction);
+        }
+        this.username = usrn;
+    }
 
     /**
      * There are two actions that happen in the run method.
@@ -159,11 +194,9 @@ public class Client implements Runnable {
             sockOut = new ObjectOutputStream(sock.getOutputStream());
             sockOut.flush();
             sockIn =  new ObjectInputStream(sock.getInputStream());
-
-            // Client introduces itself to the server by telling server
-            // it's choice of username
-            sockOut.writeObject(this.introduction);
-
+            
+            negotiateUsername(sockIn, sockOut);
+            
             while(true) {
                 try {
                     // Read user input from command line

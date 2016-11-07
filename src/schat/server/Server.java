@@ -2,12 +2,10 @@ package schat.server;
 
 import java.io.IOException;
 import java.io.PrintStream;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-
-import java.net.ServerSocket;
 import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Class abstracting the chat server definition. The server handles:

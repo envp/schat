@@ -1,9 +1,8 @@
 package schat;
 
-import schat.server.*;
-import schat.client.*;
-
 import java.io.IOException;
+import schat.client.*;
+import schat.server.*;
 
 /**
  *

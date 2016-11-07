@@ -1,12 +1,9 @@
 package schat.message;
 
 import java.io.Serializable;
-
-import java.util.StringTokenizer;
-import java.util.List;
 import java.util.ArrayList;
-
-import java.util.logging.Logger;
+import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author Vaibhav Yenamandra (vyenman@ufl.edu)

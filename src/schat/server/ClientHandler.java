@@ -1,17 +1,10 @@
 package schat.server;
 
-import schat.message.*;
-
-import java.net.Socket;
-import java.net.SocketException;
-
-import java.io.PrintStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
-import java.io.IOException;
-
-import java.util.logging.Logger;
+import java.net.Socket;
+import schat.message.*;
 
 /**
  *
