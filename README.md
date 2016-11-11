@@ -3,10 +3,10 @@
 ## Introduction
 SChat is a simple chat application that bundles a client and server in partial fulfillment of CNT5106C - Computer Networks. The full project specifications are in the `specifications/` directory.
 
-SChat serves as an example application to demonstrate one of the many ways to build a reliant chat application. 
+SChat serves as an example application to demonstrate one of the many ways to build a reliant chat application.
 
 ## Usage
-The project comes with a `Makefile` that contains various common actions (compilation, running a server instance on a predefined port, running a client instance etc.). 
+The project comes with a `Makefile` that contains various common actions (compilation, running a server instance on a predefined port, running a client instance etc.).
 
 To complile the project and store all class files in the `build/` directory run:
 ```bash
@@ -43,4 +43,3 @@ Contributions to this project (other than authors listed below) are disallowed u
 
 ## Authors
 * Vaibhav Yenamandra <vyenaman@ufl.edu>
-* Snigdha Malhotra
