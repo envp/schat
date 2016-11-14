@@ -12,7 +12,7 @@ import schat.message.*;
  */
 public class ClientHandler implements Runnable {
     private Socket sock;
-    private final int clientId;
+    private final String username;
     private ObjectInputStream sockIn;
     private ObjectOutputStream sockOut;
 
@@ -22,9 +22,17 @@ public class ClientHandler implements Runnable {
      * @param   clientId    Unique ID assigned to the client
      * @return  Creates a new worker instance to handle a single client
      */
-    public ClientHandler(Socket cSock, int clientId) {
+    public ClientHandler(Socket cSock) {
         this.sock = cSock;
-        this.clientId = clientId;
+        this.username = "";
+    }
+
+    private static void logMessage(Message message) {
+        System.out.format(
+            "{\"Message\": {\"from\":\"%s\", \"to\":%s, \"type\":\"%s\", \"body':\"%s\"}}",
+            message.getFrom(), message.getRecipients(),
+            message.getType(), message.getBody()
+        );
     }
 
     public void run() {
@@ -36,7 +44,22 @@ public class ClientHandler implements Runnable {
 
             while(true) {
                 message = (Message) this.sockIn.readObject();
-                System.out.println(message.getType());
+                ClientHandler.logMessage(message);
+
+                switch(message.getType()) {
+                    case CLIENT_INTRODUCTION:
+                        break;
+                    case CLIENT_TEXT_UNICAST:
+                    case CLIENT_TEXT_BROADCAST:
+                    case CLIENT_TEXT_BLOCKCAST:
+                        break;
+                    case CLIENT_FILE_UNICAST:
+                    case CLIENT_FILE_BROADCAST:
+                    case CLIENT_FILE_BLOCKCAST:
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         catch(ClassNotFoundException cnfe) {

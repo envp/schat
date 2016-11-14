@@ -38,8 +38,8 @@ public class SChat {
                 case "s":
                 case "server":
                     // Server instantiation
-                    Server s = new Server(Integer.parseInt(args[1]));
-                    s.listen();
+                    // Add something for optional port too
+                    Server.getInstance(Integer.parseInt(args[1])).listen();
                     break;
                 case "c":
                 case "client":

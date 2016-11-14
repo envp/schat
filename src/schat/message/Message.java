@@ -72,6 +72,10 @@ public class Message implements Serializable {
         return this.from;
     }
 
+    public String[] getRecipients() {
+        return this.to.toArray(new String[0]);
+    }
+
     // /**
     //  * Accessor method for message payload (container arbitrary binary data)
     //  * @return null if payload is empty,
