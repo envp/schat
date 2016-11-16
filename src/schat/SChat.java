@@ -46,6 +46,7 @@ public class SChat {
                     // Client instantitation
                     if(args.length < 3) {
                         System.out.println(USAGE_TIP);
+                        System.exit(1);
                     }
                     if(args.length == 3) {
                         new Thread(

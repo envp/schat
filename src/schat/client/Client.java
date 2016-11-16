@@ -97,12 +97,12 @@ public class Client implements Runnable {
                     size -= length;
                 }
                 catch(IOException ioe) {
-                    System.out.println("[ERROR] " + ioe.getMessage());
+                    System.err.println("[ERROR] " + ioe.getMessage());
                 }
             }
         }
         catch(FileNotFoundException fnfe) {
-            System.out.println("[ERROR] Can't find file: " + fnfe.getMessage());
+            System.err.println("[ERROR] " + fnfe.getMessage());
         }
     }
 
@@ -139,7 +139,7 @@ public class Client implements Runnable {
             }
         }
         catch(FileNotFoundException fnfe) {
-            System.out.println("[ERROR] Can't find file: " + fnfe.getMessage());
+            System.err.println("[ERROR] Can't find file: " + fnfe.getMessage());
         }
     }
     
@@ -158,26 +158,29 @@ public class Client implements Runnable {
         // Client introduces itself to the server by telling server
         // it's choice of username
         out.writeObject(this.introduction);
-            
+
         // Next message by protocol is the server's acknowledgement of
         // our introduction. 
         // @TODO    when does this logic of username negotiation break down?
         //          This is central as it also affects the server's user lookup 
         //          functionality
-        message = (Message) in.readObject();
-        
-        while(message.getType() == MessageType.ACK_INTRO) {
-            if(message.getBody().equals("OK")) {
-                break;
+        while(true) {
+            message = (Message) in.readObject();
+            if(MessageType.ACK_INTRO == message.getType()) {
+                if(message.getBody().equals("Y")) {
+                    System.out.format("[INFO] Server accepted chosen username (%s). Connection completed.%n", this.username);
+                    return;
+                } 
+                else { 
+                    System.out.format("[INFO] Chosen username (%s) is unavailable. Please choose another one: ", usrn);
+                    usrn = this.stdIn.readLine();
+                    System.out.format("[INFO] Negotiating username choice (%s)%n", usrn);
+                    this.username = usrn;
+                    this.introduction = new Message(MessageType.CLIENT_INTRODUCTION, "", usrn);
+                    out.writeObject(this.introduction);
+                }
             }
-            
-            System.out.print("Chosen username (" + this.username + 
-                    ") is unavailable. " + "Please choose another one: ");
-            usrn = this.stdIn.readLine();
-            this.introduction.setFrom(usrn);
-            out.writeObject(this.introduction);
         }
-        this.username = usrn;
     }
 
     /**
@@ -224,7 +227,7 @@ public class Client implements Runnable {
                     }
                 }
                 catch(IllegalMessageException ime) {
-                    System.out.println("[ERROR] " + ime.getMessage());
+                    System.err.println("[ERROR] " + ime.getMessage());
                 }
             }
         }

@@ -11,22 +11,20 @@ import java.util.concurrent.Executors;
 
 /**
  * Class abstracting the chat server definition. The server handles:
- * 1.
+ * 1. Spawning new threads for each client
+ * 2. Maintaining synchronized to various shared data structures
  *
  * @author Vaibhav Yenamandra (vyenman@ufl.edu)
  */
 public class Server {
     // Arbitary default port, nice number
-    private static final int DEFAULT_PORT  = 9129;
+    private static final int DEFAULT_PORT  = 9012;
     private static final PrintStream log = System.out;
     
     private ServerSocket sock;
-    private int onlineCount = 0;
 
-    private Object lock = new Object();
     private static ExecutorService workers = Executors.newCachedThreadPool();
-    private ConcurrentHashMap<String, ClientHandler> userList = 
-            new ConcurrentHashMap<String, ClientHandler>();
+    private ConcurrentHashMap<String, ClientHandler> userList;
     
     // Singleton instance
     private static Server self = null;
@@ -37,8 +35,14 @@ public class Server {
      * @param port Port at which server listens for incoming connections
      * @return A new server instance
      */
-    private Server(int port) throws IOException {
-        this.sock = new ServerSocket(port);
+    private Server(int port) {
+        try {
+            this.userList = new ConcurrentHashMap<>();
+            this.sock = new ServerSocket(port);
+        }
+        catch(IOException ex) {
+            System.err.println("[ERROR] " + ex.getMessage());
+        }
     }
     
     /**
@@ -97,8 +101,8 @@ public class Server {
      * connects a new worker thread is created
      * @throws java.io.IOException
      */
-    public static void listen() throws IOException {
-        self.log.println("Listening for clients on tcp://" +
+    public void listen() throws IOException {
+        log.println("Listening for clients on tcp://" +
             getInetAddress().getHostAddress() + ":" + getLocalPort()
         );
 
@@ -110,15 +114,15 @@ public class Server {
             }
         }
         catch(IOException ioe) {
-            self.log.println("[ERROR] " + ioe.getMessage());
+            log.println("[ERROR] " + ioe.getMessage());
             workers.shutdown();
         }
         finally {
             if(!workers.isShutdown()) {
-                self.log.println("Shutting server down");
+                log.println("Shutting server down");
                 workers.shutdown();
             }
-            self.sock.close();
+            sock.close();
         }
     }
 }
