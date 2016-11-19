@@ -1,9 +1,11 @@
 package schat.message;
 
-public class IllegalMessageException extends Exception {
+public class IllegalMessageException extends Exception
+{
     private static final long serialVersionUID = 1L;
 
-    public IllegalMessageException(String message) {
+    public IllegalMessageException(String message)
+    {
         super(message);
     }
 }

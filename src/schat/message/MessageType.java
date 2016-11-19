@@ -3,7 +3,8 @@ package schat.message;
 /**
  * @author Vaibhav Yenamandra (vyenman@ufl.edu)
  */
-public enum MessageType {
+public enum MessageType
+{
     ACK_INTRO, ACK_QUIT,
     CLIENT_INTRODUCTION,
     CLIENT_QUIT, CLIENT_TIMEOUT,
