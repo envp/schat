@@ -35,8 +35,6 @@ public class Message implements Serializable
 
     /**
      * Null / default constructor
-     *
-     * @return Returns an empty instance of the Message class
      */
     public Message()
     {
@@ -49,7 +47,6 @@ public class Message implements Serializable
      * @param body String / text body of the message. Can be message text or
      * filename depending on the usecase
      * @param from String that is populated with the sender's username
-     * @return A new message instance with the given
      */
     public Message(MessageType mType, String body, String from)
     {

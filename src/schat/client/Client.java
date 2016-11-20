@@ -30,7 +30,7 @@ public class Client implements Runnable
      * @param serverAddress Server IP address passed as a string. Also accepts
      * 'localhost' as a form of loopback
      * @param port Server port number to connect to.
-     * @return A new client instance created with the specified parameters
+     * @throws java.io.IOException
      */
     public Client(String username, int port, String serverAddress) throws IOException
     {
@@ -47,7 +47,7 @@ public class Client implements Runnable
      * @param username Unique string identifier chosen by each client, subject
      * to change on server-side availability
      * @param port Server port number to connect to.
-     * @return A new client instance which connects to a localhost server
+     * @throws java.io.IOException 
      */
     public Client(String username, int port) throws IOException
     {

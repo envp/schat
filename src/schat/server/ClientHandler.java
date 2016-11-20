@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -20,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ClientHandler implements Runnable
 {
     private final Socket sock;
-    private String username;
+    private final String username;
     private ObjectInputStream sockIn;
     private ObjectOutputStream sockOut;
     private ReentrantLock socketWriteLock = new ReentrantLock();
@@ -29,8 +28,6 @@ public class ClientHandler implements Runnable
      * Constructor for creating a new ClientHandler instance
      *
      * @param cSock Client socket object
-     * @param clientId Unique ID assigned to the client
-     * @return Creates a new worker instance to handle a single client
      */
     public ClientHandler(Socket cSock)
     {
@@ -88,7 +85,7 @@ public class ClientHandler implements Runnable
      * @param message Message to be sent to target user
      * @return true if write was successful, false otherwise
      */
-    public boolean dispatchMessage(Message message)
+    private boolean dispatchMessage(Message message)
     {
         this.socketWriteLock.lock();
         boolean sent = true;
