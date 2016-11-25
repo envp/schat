@@ -45,6 +45,7 @@ public class SocketOutputThread implements Runnable
         throws IOException
     {
         out.writeObject(msg);
+//        System.out.format("%s%n%n", msg.toString());
     }
 
     /**
@@ -99,8 +100,6 @@ public class SocketOutputThread implements Runnable
                     // Process if not blank
                     if (!message.isBlank())
                     {
-                        System.out.println(message);
-
                         if (message.isTextMessage())
                         {
                             processOutboundTextMessage(message, output);

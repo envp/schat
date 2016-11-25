@@ -1,0 +1,47 @@
+427 Vaibhav:schat (add_server_impl *)$ java -cp build schat.SChat s 9951                        ¦424 Vaibhav:schat (add_server_impl *)$ java -cp build schat.SChat c b 9951
+Listening for clients on tcp://0.0.0.0:9951                                                     ¦[INFO] Server accepted chosen username (b). Connection completed.
+{"Message": {"from":"c", "to":[], "type":"CLIENT_INTRODUCTION", "body":""}}                     ¦@c: test_default_broadcast
+{"Message": {"from":"b", "to":[], "type":"CLIENT_INTRODUCTION", "body":""}}                     ¦@c: test_explicit_broadcast
+{"Message": {"from":"a", "to":[], "type":"CLIENT_INTRODUCTION", "body":""}}                     ¦@c: hello b!
+{"Message": {"from":"c", "to":[], "type":"CLIENT_TEXT_BROADCAST", "body":"test_default_broadcast¦@c: hello not(a)
+"}}                                                                                             ¦@c: SUCCESS == 42 lads.
+Run handler: CLIENT_TEXT_BROADCAST                                                              ¦
+{"Message": {"from":"c", "to":[], "type":"CLIENT_TEXT_BROADCAST", "body":"test_explicit_broadcas¦
+t"}}                                                                                            ¦
+Run handler: CLIENT_TEXT_BROADCAST                                                              ¦
+{"Message": {"from":"c", "to":[a], "type":"CLIENT_TEXT_UNICAST", "body":"hello a!"}}            ¦
+Run handler: CLIENT_TEXT_UNICAST                                                                ¦
+{"Message": {"from":"c", "to":[b], "type":"CLIENT_TEXT_UNICAST", "body":"hello b!"}}            ¦
+Run handler: CLIENT_TEXT_UNICAST                                                                ¦
+{"Message": {"from":"c", "to":[a], "type":"CLIENT_TEXT_BLOCKCAST", "body":"hello not(a)"}}      ¦
+Run handler: CLIENT_TEXT_BLOCKCAST                                                              ¦
+{"Message": {"from":"c", "to":[b], "type":"CLIENT_TEXT_BLOCKCAST", "body":"hello not(b)"}}      ¦
+Run handler: CLIENT_TEXT_BLOCKCAST                                                              ¦
+{"Message": {"from":"c", "to":[], "type":"CLIENT_TEXT_BROADCAST", "body":"SUCCESS == 42 lads."}}¦
+Run handler: CLIENT_TEXT_BROADCAST                                                              ¦
+                                                                                                ¦
+                                                                                                ¦
+------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------
+412 Vaibhav:schat (add_server_impl *)$ java -cp build schat.SChat c a 9951                      ¦416 Vaibhav:schat (add_server_impl *)$ java -cp build schat.SChat c c 9951
+[INFO] Server accepted chosen username (a). Connection completed.                               ¦[INFO] Server accepted chosen username (c). Connection completed.
+@c: test_default_broadcast                                                                      ¦test_default_broadcast
+@c: test_explicit_broadcast                                                                     ¦@c: test_default_broadcast
+@c: hello a!                                                                                    ¦/text test_explicit_broadcast
+@c: hello not(b)                                                                                ¦@c: test_explicit_broadcast
+@c: SUCCESS == 42 lads.                                                                         ¦/text @a hello a!
+                                                                                                ¦/text @b hello b!
+                                                                                                ¦/text !a hello not(a)
+                                                                                                ¦@c: hello not(a)
+                                                                                                ¦/text !b hello not(b)
+                                                                                                ¦@c: hello not(b)
+                                                                                                ¦SUCCESS == 42 lads.
+                                                                                                ¦@c: SUCCESS == 42 lads.
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+[2] 0:"C:\Program*                                                                                                                                                     "Setsuko" 19:19 24-Nov-16

@@ -97,6 +97,7 @@ public class SocketInputThread implements Runnable
             catch (IOException | ClassNotFoundException ex)
             {
                 System.err.println("[ERROR] " + ex.getMessage());
+                break;
             }
         }
     }

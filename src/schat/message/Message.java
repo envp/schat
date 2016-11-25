@@ -3,11 +3,8 @@ package schat.message;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author Vaibhav Yenamandra (vyenman@ufl.edu)
@@ -153,7 +150,7 @@ public class Message implements Serializable
     @Override
     public String toString()
     {
-        return String.format("@%s: %s%n", this.from, this.body);
+        return String.format("@%s: %s", this.from, this.body);
     }
 
     /**
@@ -303,7 +300,7 @@ public class Message implements Serializable
             + "{\"from\":\"%s\", "
             + "\"to\":%s, "
             + "\"type\":\"%s\", "
-            + "\"body':\"%s\"}}",
+            + "\"body\":\"%s\"}}",
             message.getFrom(), Arrays.toString(message.getRecipients()),
             message.getType(), message.getBody()
         );

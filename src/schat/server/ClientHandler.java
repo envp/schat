@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -19,10 +20,10 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ClientHandler implements Runnable
 {
     private final Socket sock;
-    private final String username;
+    private String username;
     private ObjectInputStream sockIn;
     private ObjectOutputStream sockOut;
-    private ReentrantLock socketWriteLock = new ReentrantLock();
+    private final ReentrantLock socketWriteLock = new ReentrantLock();
 
     /**
      * Constructor for creating a new ClientHandler instance
@@ -70,6 +71,7 @@ public class ClientHandler implements Runnable
         }
         catch (IOException ex)
         {
+            System.err.println("[ERROR] " + ex.getMessage());
             sent = false;
         }
         finally
@@ -87,7 +89,7 @@ public class ClientHandler implements Runnable
      */
     private boolean dispatchMessage(Message message)
     {
-        this.socketWriteLock.lock();
+        this.socketWriteLock.tryLock();
         boolean sent = true;
         try
         {
@@ -95,11 +97,12 @@ public class ClientHandler implements Runnable
         }
         catch (IOException ex)
         {
+            System.err.println("[ERROR]" + ex.getMessage());
             sent = false;
         }
         finally
         {
-            socketWriteLock.unlock();
+            this.socketWriteLock.unlock();
         }
         return sent;
     }
@@ -119,6 +122,7 @@ public class ClientHandler implements Runnable
         {
             users.putIfAbsent(message.getFrom(), this);
             temp.setBody("Y");
+            this.username = message.getFrom();
         }
         this.dispatchMessage(temp);
     }
@@ -135,41 +139,44 @@ public class ClientHandler implements Runnable
 
     private boolean broadcastText(Message message)
     {
-        boolean sent = true;
         Collection<ClientHandler> handlers = Server.getUserList().values();
-        
+
         // Need to unset the message.to field, so create a fresh object local
-        // to this so as not 
+        // to this so as not cause problems
         Message msg = new Message(
             message.getType(), message.getBody(), message.getFrom()
         );
-        
-        for(ClientHandler handler : handlers)
-        {
-            dispatchMessage(handler, msg);
-        }
-        return sent;
+        return dispatchMultiple(handlers, msg);
     }
 
     private boolean blockcastText(Message message)
     {
-        boolean sent = true;
-        Collection<ClientHandler> handlers = Server.getUserList().values();
         
-        // Need to unset the message.to field, so create a fresh object local
-        // to this so as not 
+        List<String> blockList = Arrays.asList(message.getRecipients());
+//        blockList.add(this.username);
+        
+        // Filter out the ones we don't want to send stuff to
+        List<ClientHandler> handlers = Server.getUserList().values().
+            stream().
+            filter(handler -> !blockList.contains(handler.username)).
+            collect(Collectors.toList());
+
+        // Need to unset the message.to field, so create a fresh local object
         Message msg = new Message(
             message.getType(), message.getBody(), message.getFrom()
         );
-        
-        List<String> users = Arrays.asList(message.getRecipients());
-        
+        return dispatchMultiple(handlers, msg);
+    }
+
+    private boolean dispatchMultiple(
+        Collection<ClientHandler> handlers, 
+        Message message
+    )
+    {
+        boolean sent = true;
         for(ClientHandler handler : handlers)
         {
-            if(users.indexOf(handler.username) > 0)
-            {
-                sent = sent & dispatchMessage(handler, msg);
-            }
+            sent = sent & dispatchMessage(handler, message);
         }
         return sent;
     }
@@ -195,17 +202,23 @@ public class ClientHandler implements Runnable
                         processIntroduction(message);
                         break;
                     case CLIENT_TEXT_UNICAST:
+                        System.out.println("Run handler: " + message.getType());
                         unicastText(message);
                         break;
                     case CLIENT_TEXT_BROADCAST:
+                        System.out.println("Run handler: " + message.getType());
                         broadcastText(message);
                         break;
                     case CLIENT_TEXT_BLOCKCAST:
+                        System.out.println("Run handler: " + message.getType());
                         blockcastText(message);
                         break;
                     case CLIENT_FILE_UNICAST:
+                        System.out.println("Run handler: " + message.getType());
                     case CLIENT_FILE_BROADCAST:
+                        System.out.println("Run handler: " + message.getType());
                     case CLIENT_FILE_BLOCKCAST:
+                        System.out.println("Run handler: " + message.getType());
                         break;
                     default:
                         break;
