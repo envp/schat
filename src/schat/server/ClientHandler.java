@@ -53,7 +53,7 @@ public class ClientHandler implements Runnable
      * @param message Message to be sent to target user
      * @return true if write was successful, false otherwise
      */
-    public boolean dispatchMessage(ClientHandler other, Message message)
+    public boolean dispatchText(ClientHandler other, Message message)
     {
         this.socketWriteLock.lock();
         boolean sent = true;
@@ -131,7 +131,7 @@ public class ClientHandler implements Runnable
     {
         // Just picks up the first one, doesn't check length since it is assumed
         // that malformed messages are corrected client-side
-        return dispatchMessage(
+        return dispatchText(
             Server.getUserList().get(message.getRecipients()[0]),
             message
         );
@@ -146,7 +146,7 @@ public class ClientHandler implements Runnable
         Message msg = new Message(
             message.getType(), message.getBody(), message.getFrom()
         );
-        return dispatchMultiple(handlers, msg);
+        return dispatchMultiText(handlers, msg);
     }
 
     private boolean blockcastText(Message message)
@@ -165,10 +165,10 @@ public class ClientHandler implements Runnable
         Message msg = new Message(
             message.getType(), message.getBody(), message.getFrom()
         );
-        return dispatchMultiple(handlers, msg);
+        return dispatchMultiText(handlers, msg);
     }
 
-    private boolean dispatchMultiple(
+    private boolean dispatchMultiText(
         Collection<ClientHandler> handlers, 
         Message message
     )
@@ -176,7 +176,7 @@ public class ClientHandler implements Runnable
         boolean sent = true;
         for(ClientHandler handler : handlers)
         {
-            sent = sent & dispatchMessage(handler, message);
+            sent = sent & dispatchText(handler, message);
         }
         return sent;
     }
@@ -202,21 +202,21 @@ public class ClientHandler implements Runnable
                         processIntroduction(message);
                         break;
                     case CLIENT_TEXT_UNICAST:
-                        System.out.println("Run handler: " + message.getType());
                         unicastText(message);
                         break;
                     case CLIENT_TEXT_BROADCAST:
-                        System.out.println("Run handler: " + message.getType());
                         broadcastText(message);
                         break;
                     case CLIENT_TEXT_BLOCKCAST:
-                        System.out.println("Run handler: " + message.getType());
                         blockcastText(message);
                         break;
                     case CLIENT_FILE_UNICAST:
                         System.out.println("Run handler: " + message.getType());
+                        
+                        break;
                     case CLIENT_FILE_BROADCAST:
                         System.out.println("Run handler: " + message.getType());
+                        break;
                     case CLIENT_FILE_BLOCKCAST:
                         System.out.println("Run handler: " + message.getType());
                         break;
