@@ -32,16 +32,19 @@ Supported subcommands and their [h]otkeys:
 ```
 
 Running a server on port `12410` is achieved with one of:
+
 1. `java -cp build/ schat.SChat server 12410`
 2. `java -jar schat server 12410`
 3. `java -jar schat s 12410`
 
 Connecting a client to the same server (server ip not required in test /localhost mode.
+
 1. `java -cp build/ schat.SChat client <username> 12410 <server_ip>`
 2. `java -jar schat.jar client <username> 12410 <server_ip>`
 3. `java -jar schat.jar c <username> 12410 <server_ip>`
 
 Commands to the server are plaintext statements, like so:
+
 1. By default, whatever you type into the console is taken as input for a server-wide text broadcast
 2. `/text <message>` also broadcasts a message to everyone on the server
 3. `/text @a @b @c <message>` sends a message to users with usernames `a`, `b`, `c`, list can be as long as required
