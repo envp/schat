@@ -15,13 +15,13 @@ public class Message implements Serializable
     private static final long serialVersionUID = 1L;
 
     // Maximum byte size of message payload
-    public static final int MAX_PAYLOAD_SIZE = 8192;
+    public static final int MAX_PAYLOAD_SIZE = 1024;
 
     private MessageType type;
     private String from;
     private List<String> to = new ArrayList<>();
-    private String body = "";
-    private long payloadSize = -1;
+    private String body;
+    private long payloadSize;
 
     private static final char TOK_CMD_START = '/';
     private static final String TOK_CMD_BLK = "!";
@@ -35,6 +35,8 @@ public class Message implements Serializable
      */
     public Message()
     {
+        this.body = "";
+        this.payloadSize = -1;
     }
 
     /**
@@ -50,6 +52,7 @@ public class Message implements Serializable
         this.type = mType;
         this.body = body;
         this.from = from;
+        this.payloadSize = -1;
     }
 
     /**
@@ -81,7 +84,7 @@ public class Message implements Serializable
     {
         return this.from;
     }
-    
+
     /**
      * Returns the list of recipients as an array
      *

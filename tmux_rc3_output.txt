@@ -1,0 +1,47 @@
+534 Vaibhav:schat (add_server_impl *)$ make compile
+Building sources...
+Sources built!
+535 Vaibhav:schat (add_server_impl)$ java -cp build schat.SChat s 9900
+Listening for clients on tcp://0.0.0.0:9900
+{"Message": {"from":"a", "to":[], "type":"CLIENT_INTRODUCTION", "body":""}}
+{"Message": {"from":"b", "to":[], "type":"CLIENT_INTRODUCTION", "body":""}}
+{"Message": {"from":"b", "to":[], "type":"CLIENT_FILE_BROADCAST", "body":"project_fall16.pdf"}}
+{"Message": {"from":"b", "to":[], "type":"CLIENT_FILE_BROADCAST", "body":"schat"}}
+{"Message": {"from":"b", "to":[], "type":"CLIENT_FILE_BROADCAST", "body":"OOP.7z"}}
+{"Message": {"from":"b", "to":[], "type":"CLIENT_FILE_BROADCAST", "body":"schat"}}
+{"Message": {"from":"b", "to":[], "type":"CLIENT_FILE_BROADCAST", "body":".classpath"}}
+
+
+
+
+
+
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+534 Vaibhav:schat (add_server_impl *)$ make compile                                             ¦534 Vaibhav:schat (add_server_impl *)$ make compile
+Building sources...                                                                             ¦Building sources...
+Sources built!                                                                                  ¦Sources built!
+535 Vaibhav:schat (add_server_impl)$ java -cp build schat.SChat c a 9900                        ¦535 Vaibhav:schat (add_server_impl)$ java -cp build schat.SChat c b 9900
+[INFO] Server accepted chosen username (a). Connection completed.                               ¦[INFO] Server accepted chosen username (b). Connection completed.
+                                                                                                ¦/file specification/project_fall16.pdf
+                                                                                                ¦Sending: C:\Users\Vaibhav\Dropbox\code\java\schat\specification\project_fall16.pdf (443943 byte
+                                                                                                ¦s)
+                                                                                                ¦/file schat
+                                                                                                ¦Sending: C:\Users\Vaibhav\Dropbox\code\java\schat\schat (468956 bytes)
+                                                                                                ¦/file ../OOP.7z
+                                                                                                ¦Sending: C:\Users\Vaibhav\Dropbox\code\java\schat\..\OOP.7z (838790 bytes)
+                                                                                                ¦/file ./schat
+                                                                                                ¦Sending: C:\Users\Vaibhav\Dropbox\code\java\schat\.\schat (468956 bytes)
+                                                                                                ¦/file ./.././.classpath
+                                                                                                ¦Sending: C:\Users\Vaibhav\Dropbox\code\java\schat\.\..\.\.classpath (226 bytes)
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+[5] 0:"C:\Program*                                                                                                                                                     "Setsuko" 22:14 25-Nov-16

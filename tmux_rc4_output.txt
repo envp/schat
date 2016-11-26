@@ -1,0 +1,47 @@
+534 Vaibhav:schat (add_server_impl *)$ java -cp build schat.SChat c b 9900
+[INFO] Server accepted chosen username (b). Connection completed.
+Recieving file: build.xml (3600 bytes)
+Recieving file: README.md (2813 bytes)
+@c: HELLO EVERYNYAN
+@c: not a!
+
+
+
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Sending: C:\Users\Vaibhav\Dropbox\code\java\schat\manifest.mf (85 bytes)
+/file !a build.xml
+Sending: C:\Users\Vaibhav\Dropbox\code\java\schat\build.xml (3600 bytes)
+/file README.md
+Sending: C:\Users\Vaibhav\Dropbox\code\java\schat\README.md (2813 bytes)
+/file !a !b schat
+Sending: C:\Users\Vaibhav\Dropbox\code\java\schat\schat (468956 bytes)
+/text HELLO EVERYNYAN
+/text @a come play?
+/text !a not a!
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+531 Vaibhav:schat (add_server_impl *)$ java -cp build/ schat.SChat s 9900                       ¦536 Vaibhav:schat (add_server_impl *)$ java -cp build schat.SChat c a 9900
+Listening for clients on tcp://0.0.0.0:9900                                                     ¦[INFO] Server accepted chosen username (a). Connection completed.
+{"Message": {"from":"c", "to":[], "type":"CLIENT_INTRODUCTION", "body":""}}                     ¦Recieving file: manifest.mf (85 bytes)
+{"Message": {"from":"a", "to":[], "type":"CLIENT_INTRODUCTION", "body":""}}                     ¦Recieving file: README.md (2813 bytes)
+{"Message": {"from":"b", "to":[], "type":"CLIENT_INTRODUCTION", "body":""}}                     ¦@c: HELLO EVERYNYAN
+{"Message": {"from":"c", "to":[a], "type":"CLIENT_FILE_UNICAST", "body":"manifest.mf"}}         ¦@c: come play?
+{"Message": {"from":"c", "to":[a], "type":"CLIENT_FILE_BLOCKCAST", "body":"build.xml"}}         ¦
+{"Message": {"from":"c", "to":[], "type":"CLIENT_FILE_BROADCAST", "body":"README.md"}}          ¦
+{"Message": {"from":"c", "to":[a, b], "type":"CLIENT_FILE_BLOCKCAST", "body":"schat"}}          ¦
+{"Message": {"from":"c", "to":[], "type":"CLIENT_TEXT_BROADCAST", "body":"HELLO EVERYNYAN"}}    ¦
+{"Message": {"from":"c", "to":[a], "type":"CLIENT_TEXT_UNICAST", "body":"come play?"}}          ¦
+{"Message": {"from":"c", "to":[a], "type":"CLIENT_TEXT_BLOCKCAST", "body":"not a!"}}            ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+                                                                                                ¦
+[6] 0:"C:\Program*                                                                                                                                                     "Setsuko" 13:22 26-Nov-16

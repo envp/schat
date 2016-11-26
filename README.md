@@ -31,15 +31,30 @@ Supported subcommands and their [h]otkeys:
            <port> Server's listening port to connect to
 ```
 
-Running a server on port `12410` is achieved with:`java -cp build/ schat.SChat server 12410`
+Running a server on port `12410` is achieved with one of:
+1. `java -cp build/ schat.SChat server 12410`
+2. `java -jar schat server 12410`
+3. `java -jar schat s 12410`
 
-Connecting a client to the same:`java -cp build/ schat.SChat client <username> 12410 <server_ip>`
+Connecting a client to the same server (server ip not required in test /localhost mode.
+1. `java -cp build/ schat.SChat client <username> 12410 <server_ip>`
+2. `java -jar schat.jar client <username> 12410 <server_ip>`
+3. `java -jar schat.jar c <username> 12410 <server_ip>`
+
+Commands to the server are plaintext statements, like so:
+1. By default, whatever you type into the console is taken as input for a server-wide text broadcast
+2. `/text <message>` also broadcasts a message to everyone on the server
+3. `/text @a @b @c <message>` sends a message to users with usernames `a`, `b`, `c`, list can be as long as required
+4. `/text !a !b !c` sends a message to everyone but users with usernames `a`, `b`, `c`, list can be as long as required
+5. `/file <relative-path>` sends a file stored at `<relative-path>` from where the executable is being run, this is broadcasted to all
+6. `/file @a @b @c <relative-path>` sends the file to users with usernames `a`, `b`, `c`, list can be as long as required
+7. `/file !a !b !c` sends the file to everyone but users with usernames `a`, `b`, `c`, list can be as long as required
 
 ## Documentation
-TODO, need to generate and host javadoc.
+See release.
 
 ## Contributing
-Contributions to this project (other than authors listed below) are disallowed until the end of Fall'16 semester.
+Contributions to this project (other than from authors listed below) are disallowed until the end of Fall'16 semester.
 
 ## Authors
 * Vaibhav Yenamandra <vyenaman@ufl.edu>

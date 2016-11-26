@@ -25,7 +25,7 @@ clean:
 compile:
 	@echo Building sources...
 	@mkdir -p build
-	@$(JC) -g -d $(BUILD_PATH) -sourcepath $(SOURCES) $(SRC_PATH)/*.java
+	@$(JC) -g -Xlint:unchecked -d $(BUILD_PATH) -sourcepath $(SOURCES) $(SRC_PATH)/*.java
 	@echo Sources built!
 
 run_client:

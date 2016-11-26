@@ -7,7 +7,6 @@ import java.net.ServerSocket;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Executors;
 
 /**
  * Class abstracting the chat server definition. The server handles: 1. Spawning
@@ -20,7 +19,7 @@ public class Server
 {
     // Arbitary default port, nice number
     private static final int DEFAULT_PORT = 9012;
-    private static final PrintStream log = System.out;
+    private static PrintStream log = System.out;
 
     private ServerSocket sock;
 

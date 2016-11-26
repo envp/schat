@@ -1,5 +1,7 @@
 package schat.client;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,7 +10,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import schat.message.IllegalMessageException;
 import schat.message.Message;
@@ -41,10 +42,10 @@ public class SocketOutputThread implements Runnable
      *
      * @param msg Message object containing outbound message
      */
-    private void processOutboundTextMessage(Message msg, ObjectOutputStream out)
+    private void processOutboundTextMessage(Message msg)
         throws IOException
     {
-        out.writeObject(msg);
+        this.output.writeObject(msg);
 //        System.out.format("%s%n%n", msg.toString());
     }
 
@@ -53,32 +54,59 @@ public class SocketOutputThread implements Runnable
      *
      * @param msg Message with path of file to be dumped into network
      */
-    private void processOutboundFileMessage(Message msg, ObjectOutputStream out)
+    private void processOutboundFileMessage(Message msg)
         throws IOException
     {
-        // Try to create a file stream from the supplied object
-        try
+        byte[] buffer;
+        int bytesRead;
+        File sendFile = new File(msg.getBody());
+        
+        msg.setPayloadSize(sendFile.length());
+        msg.setBody(sendFile.getName());
+        
+        System.out.format("Sending: %s (%d bytes)%n", 
+            sendFile.getAbsolutePath(), 
+            sendFile.length()
+        );
+        BufferedInputStream fileReadStream = null;
+        BufferedOutputStream fileToSocket = new BufferedOutputStream(
+            this.socket.getOutputStream()
+        );
+
+        if (sendFile.exists())
         {
-            InputStream file = new FileInputStream(msg.getBody());
-            OutputStream sockOut = this.socket.getOutputStream();
-
-            byte[] buffer = new byte[Message.MAX_PAYLOAD_SIZE];
-            int length = 0;
-
-            // Tell them the file size to expect
-            File f = new File(msg.getBody());
-            msg.setPayloadSize(f.length());
-            msg.setBody(f.getName());
-            out.writeObject(msg);
-
-            while ((length = file.read(buffer)) != -1)
+            this.output.writeObject(msg);
+            buffer = new byte[Message.MAX_PAYLOAD_SIZE];
+            try
             {
-                sockOut.write(buffer, 0, length);
+                fileReadStream = new BufferedInputStream(
+                    new FileInputStream(sendFile)
+                );
             }
-        }
-        catch (FileNotFoundException fnfe)
-        {
-            System.err.println("[ERROR] Can't find file: " + fnfe.getMessage());
+            catch (FileNotFoundException ex)
+            {
+                System.err.println("[ERROR] " + ex.getMessage());
+            }
+
+            try
+            {
+                while ((bytesRead = fileReadStream.read(buffer, 0, buffer.length)) != -1)
+                {
+                    fileToSocket.write(buffer, 0, bytesRead);
+                }
+                fileToSocket.flush();
+            }
+            catch (IOException ex)
+            {
+                System.err.println("[ERROR] " + ex.getMessage());
+            }
+            finally
+            {
+                if (fileReadStream != null)
+                {
+                    fileReadStream.close();
+                }
+            }
         }
     }
 
@@ -102,11 +130,11 @@ public class SocketOutputThread implements Runnable
                     {
                         if (message.isTextMessage())
                         {
-                            processOutboundTextMessage(message, output);
+                            processOutboundTextMessage(message);
                         }
                         if (message.isFileMessage())
                         {
-                            processOutboundFileMessage(message, output);
+                            processOutboundFileMessage(message);
                         }
                     }
                 }

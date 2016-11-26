@@ -47,7 +47,7 @@ public class Client implements Runnable
      * @param username Unique string identifier chosen by each client, subject
      * to change on server-side availability
      * @param port Server port number to connect to.
-     * @throws java.io.IOException 
+     * @throws java.io.IOException
      */
     public Client(String username, int port) throws IOException
     {
@@ -137,7 +137,7 @@ public class Client implements Runnable
                 )
             );
             ioThreadPool.execute(
-                new SocketInputThread(this.username, this.sockIn)
+                new SocketInputThread(this.username, this.sock, this.sockIn)
             );
         }
         catch (IOException | ClassNotFoundException ex)
