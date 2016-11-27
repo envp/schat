@@ -66,9 +66,8 @@ public class SocketInputThread implements Runnable
         int size, currentPos, bytesRead;
         byte[] buffer;
         
-        System.out.format("Recieving file: %s (%d bytes)%n", 
-            msg.getBody(),
-            msg.getPayloadSize()
+        System.out.format("Recieving file: %s (%d bytes) from user @%s%n", 
+            msg.getBody(), msg.getPayloadSize(), msg.getFrom()
         );
 
         try
@@ -89,6 +88,7 @@ public class SocketInputThread implements Runnable
             } while (bytesRead != -1 && currentPos < size);
             fileOutStream.flush();
             fileOutStream.close();
+            System.out.println("File recieved.");
         }
         catch (IOException ex)
         {
