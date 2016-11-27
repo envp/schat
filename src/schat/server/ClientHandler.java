@@ -121,7 +121,7 @@ public class ClientHandler implements Runnable
         }
         return sent;
     }
-    
+
     private boolean dispatchMultiFile(
         List<ClientHandler> handlers,
         Message message
@@ -138,7 +138,7 @@ public class ClientHandler implements Runnable
             // First we acquire locks to get all the output streams from
             // each of the the handlers
             ClientHandler handler;
-            for(int i = 0; i < handlers.size(); ++i)
+            for (int i = 0; i < handlers.size(); ++i)
             {
                 handler = handlers.get(i);
                 handler.socketIOLock.tryLock();
@@ -160,18 +160,18 @@ public class ClientHandler implements Runnable
                     handler.socketIOLock.unlock();
                 }
             }
-            
+
             // Now that we have the respective output streams, we can write
             // the data we read to each, one by one
             currentPos = 0;
             size = (int) message.getPayloadSize();
             buffer = new byte[Message.MAX_PAYLOAD_SIZE];
             in = new BufferedInputStream(this.sock.getInputStream());
-            
+
             do
             {
                 bytesRead = in.read(buffer, 0, buffer.length);
-                for(int i = 0; i < handlers.size(); ++i)
+                for (int i = 0; i < handlers.size(); ++i)
                 {
                     handler = handlers.get(i);
                     handler.socketIOLock.tryLock();
@@ -186,8 +186,8 @@ public class ClientHandler implements Runnable
                     }
                 }
                 currentPos += bytesRead;
-            } while(bytesRead != -1 && currentPos < size);
-            
+            } while (bytesRead != -1 && currentPos < size);
+
         }
         catch (IOException ex)
         {
@@ -222,8 +222,9 @@ public class ClientHandler implements Runnable
     }
 
     /**
-     * Not strictly unicast but a multicast method. Sends the message to a
-     * list of recipients, also forwards attachments
+     * Not strictly unicast but a multicast method. Sends the message to a list
+     * of recipients, also forwards attachments
+     *
      * @param message Message to be sent (may be text or file)
      * @return boolean status indicating success of relay operation
      */
@@ -234,15 +235,13 @@ public class ClientHandler implements Runnable
             Arrays.asList(message.getRecipients())
         );
         List<ClientHandler> handlers = users.stream().
-            filter(h -> (
-                    recipients.contains(h.username) && 
-                    !h.username.equals(this.username)
-                )
+            filter(h -> (recipients.contains(h.username)
+                && !h.username.equals(this.username))
             ).collect(Collectors.toList());
-        
-        if(message.isTextMessage())
+
+        if (message.isTextMessage())
         {
-            return this.dispatchMultiText(handlers ,message);
+            return this.dispatchMultiText(handlers, message);
         }
         // It is a file message (guaranteed by switch-case)
         return this.dispatchMultiFile(handlers, message);
@@ -250,6 +249,7 @@ public class ClientHandler implements Runnable
 
     /**
      * Sends a file to all users but the sender on the server
+     *
      * @param message Message to be relayed
      * @return boolean status indicating success of relay operation
      */
@@ -267,18 +267,19 @@ public class ClientHandler implements Runnable
             message.getType(), message.getBody(), message.getFrom()
         );
 
-        if(message.isTextMessage())
+        if (message.isTextMessage())
         {
             return dispatchMultiText(handlers, msg);
         }
         // It is a file message (guaranteed by switch-case)
         msg.setPayloadSize(message.getPayloadSize());
-        
+
         return dispatchMultiFile(handlers, msg);
     }
 
     /**
      * Sends file to all but some users on the server (including sender)
+     *
      * @param message Message to be relayed
      * @return boolean status indicating success of relay operation
      */
@@ -302,11 +303,11 @@ public class ClientHandler implements Runnable
         Message msg = new Message(
             message.getType(), message.getBody(), message.getFrom()
         );
-        if(message.isTextMessage())
+        if (message.isTextMessage())
         {
             return dispatchMultiText(handlers, msg);
         }
-        
+
         msg.setPayloadSize(message.getPayloadSize());
 
         return dispatchMultiFile(handlers, msg);
@@ -349,9 +350,19 @@ public class ClientHandler implements Runnable
                 }
             }
         }
-        catch (ClassNotFoundException | IOException ex)
+        catch (ClassNotFoundException ex)
         {
             System.err.println("[ERROR]: " + ex.getMessage());
         }
+        catch (IOException ex)
+        {
+            // Connection was reset, remove self from the list of users online
+            System.err.println("[ERROR]: " + ex.getMessage());
+            // Connection was reset, remove self from the list of users online
+            ClientHandler self = Server.getUserList().remove(this.username);
+            if(self != null)
+            {
+                System.out.println("Goodbye, " + self.username);
+            }}
+        }
     }
-}

@@ -65,8 +65,8 @@ public class SocketInputThread implements Runnable
         BufferedInputStream in = null;
         int size, currentPos, bytesRead;
         byte[] buffer;
-        
-        System.out.format("Recieving file: %s (%d bytes) from user @%s%n", 
+
+        System.out.format("Recieving file: %s (%d bytes) from user @%s%n",
             msg.getBody(), msg.getPayloadSize(), msg.getFrom()
         );
 
