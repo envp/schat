@@ -15,7 +15,7 @@ public class Message implements Serializable
     private static final long serialVersionUID = 1L;
 
     // Maximum byte size of message payload
-    public static final int MAX_PAYLOAD_SIZE = 1024;
+    public static final int MAX_PAYLOAD_SIZE = 8192;
 
     private MessageType type;
     private String from;

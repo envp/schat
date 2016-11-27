@@ -64,17 +64,17 @@ public class SocketOutputThread implements Runnable
         msg.setPayloadSize(sendFile.length());
         msg.setBody(sendFile.getName());
         
-        System.out.format("Sending: %s (%d bytes)%n", 
-            sendFile.getAbsolutePath(), 
-            sendFile.length()
-        );
         BufferedInputStream fileReadStream = null;
         BufferedOutputStream fileToSocket = new BufferedOutputStream(
             this.socket.getOutputStream()
         );
 
-        if (sendFile.exists())
+        if (sendFile.exists() && sendFile.isFile())
         {
+            System.out.format("Sending file: %s (%d bytes)%n", 
+                sendFile.getAbsolutePath(), 
+                sendFile.length()
+            );
             this.output.writeObject(msg);
             buffer = new byte[Message.MAX_PAYLOAD_SIZE];
             try
@@ -107,6 +107,13 @@ public class SocketOutputThread implements Runnable
                     fileReadStream.close();
                 }
             }
+            System.out.println("File sent.");
+        }
+        else
+        {
+            System.out.format("[ERROR] Path not a file, or doesnt exist: %s%n", 
+                sendFile.getAbsolutePath()
+            );
         }
     }
 

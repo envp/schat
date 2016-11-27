@@ -121,53 +121,6 @@ public class ClientHandler implements Runnable
         }
         return sent;
     }
-
-    private boolean dispatchFile(ClientHandler other, Message message)
-    {
-        this.socketIOLock.lock();
-        boolean sent = true;
-        int currentPos, size, bytesRead;
-        byte[] buffer;
-        BufferedInputStream in = null;
-        BufferedOutputStream out = null;
-
-        try
-        {
-            other.socketIOLock.tryLock();
-            try
-            {
-                other.sockOut.writeObject(message);
-
-                currentPos = 0;
-                size = (int) message.getPayloadSize();
-                buffer = new byte[Message.MAX_PAYLOAD_SIZE];
-                in = new BufferedInputStream(this.sock.getInputStream());
-                out = new BufferedOutputStream(other.sock.getOutputStream());
-
-                do
-                {
-                    bytesRead = in.read(buffer, 0, buffer.length);
-                    out.write(buffer, 0, bytesRead);
-                    currentPos += bytesRead;
-                } while (bytesRead != -1 && currentPos < size);
-                out.flush();
-            }
-            catch (IOException ex)
-            {
-                System.err.println("[ERROR] " + ex.getMessage());
-                sent = false;
-            }
-            finally
-            {
-                other.socketIOLock.unlock();
-            }
-        }
-        finally
-        {
-            this.socketIOLock.unlock();
-        }
-        return sent;
-    }
     
     private boolean dispatchMultiFile(
         List<ClientHandler> handlers,
@@ -268,17 +221,39 @@ public class ClientHandler implements Runnable
         this.dispatchText(temp);
     }
 
-    private boolean unicastText(Message message)
+    /**
+     * Not strictly unicast but a multicast method. Sends the message to a
+     * list of recipients, also forwards attachments
+     * @param message Message to be sent (may be text or file)
+     * @return boolean status indicating success of relay operation
+     */
+    private boolean unicastMessage(Message message)
     {
-        // Just picks up the first one, doesn't check length since it is assumed
-        // that malformed messages are corrected client-side
-        return this.dispatchText(
-            Server.getUserList().get(message.getRecipients()[0]),
-            message
+        Collection<ClientHandler> users = Server.getUserList().values();
+        HashSet<String> recipients = new HashSet<>(
+            Arrays.asList(message.getRecipients())
         );
+        List<ClientHandler> handlers = users.stream().
+            filter(h -> (
+                    recipients.contains(h.username) && 
+                    !h.username.equals(this.username)
+                )
+            ).collect(Collectors.toList());
+        
+        if(message.isTextMessage())
+        {
+            return this.dispatchMultiText(handlers ,message);
+        }
+        // It is a file message (guaranteed by switch-case)
+        return this.dispatchMultiFile(handlers, message);
     }
 
-    private boolean broadcastText(Message message)
+    /**
+     * Sends a file to all users but the sender on the server
+     * @param message Message to be relayed
+     * @return boolean status indicating success of relay operation
+     */
+    private boolean broadcastMessage(Message message)
     {
         Collection<ClientHandler> users = Server.getUserList().values();
         List<ClientHandler> handlers = users.
@@ -291,60 +266,23 @@ public class ClientHandler implements Runnable
         Message msg = new Message(
             message.getType(), message.getBody(), message.getFrom()
         );
-        return dispatchMultiText(handlers, msg);
-    }
 
-    private boolean blockcastText(Message message)
-    {
-
-        HashSet<String> blockList = new HashSet<>(
-            Arrays.asList(message.getRecipients())
-        );
-        blockList.add(this.username);
-
-        // Filter out the ones we don't want to send stuff to
-        List<ClientHandler> handlers = Server.getUserList().values().
-            stream().
-            filter(
-                h -> !blockList.contains(h.username)
-            ).
-            collect(Collectors.toList());
-
-        // Need to unset the message.to field, so create a fresh local object
-        Message msg = new Message(
-            message.getType(), message.getBody(), message.getFrom()
-        );
-        return dispatchMultiText(handlers, msg);
-    }
-
-    private boolean unicastFile(Message message)
-    {
-        // Just picks up the first one, doesn't check length since it is assumed
-        // that malformed messages are corrected client-side
-        return this.dispatchFile(
-            Server.getUserList().get(message.getRecipients()[0]),
-            message
-        );
-    }
-
-    private boolean broadcastFile(Message message)
-    {
-        List<ClientHandler> handlers = Server.getUserList().values().
-            stream().
-            filter(h -> !h.username.equals(this.username)).
-            collect(Collectors.toList());
-
-        // Need to unset the message.to field, so create a fresh object local
-        // to this so as not cause problems
-        Message msg = new Message(
-            message.getType(), message.getBody(), message.getFrom()
-        );
+        if(message.isTextMessage())
+        {
+            return dispatchMultiText(handlers, msg);
+        }
+        // It is a file message (guaranteed by switch-case)
         msg.setPayloadSize(message.getPayloadSize());
         
         return dispatchMultiFile(handlers, msg);
     }
 
-    private boolean blockcastFile(Message message)
+    /**
+     * Sends file to all but some users on the server (including sender)
+     * @param message Message to be relayed
+     * @return boolean status indicating success of relay operation
+     */
+    private boolean blockcastMessage(Message message)
     {
 
         HashSet<String> blockList = new HashSet<>(
@@ -364,6 +302,11 @@ public class ClientHandler implements Runnable
         Message msg = new Message(
             message.getType(), message.getBody(), message.getFrom()
         );
+        if(message.isTextMessage())
+        {
+            return dispatchMultiText(handlers, msg);
+        }
+        
         msg.setPayloadSize(message.getPayloadSize());
 
         return dispatchMultiFile(handlers, msg);
@@ -390,22 +333,16 @@ public class ClientHandler implements Runnable
                         processIntroduction(message);
                         break;
                     case CLIENT_TEXT_UNICAST:
-                        unicastText(message);
+                    case CLIENT_FILE_UNICAST:
+                        unicastMessage(message);
                         break;
                     case CLIENT_TEXT_BROADCAST:
-                        broadcastText(message);
+                    case CLIENT_FILE_BROADCAST:
+                        broadcastMessage(message);
                         break;
                     case CLIENT_TEXT_BLOCKCAST:
-                        blockcastText(message);
-                        break;
-                    case CLIENT_FILE_UNICAST:
-                        unicastFile(message);
-                        break;
-                    case CLIENT_FILE_BROADCAST:
-                        broadcastFile(message);
-                        break;
                     case CLIENT_FILE_BLOCKCAST:
-                        blockcastFile(message);
+                        blockcastMessage(message);
                         break;
                     default:
                         break;
